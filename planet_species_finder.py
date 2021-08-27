@@ -1,16 +1,8 @@
-# Using data provided from the
-#       Star Wars API (https://swapi.dev/)
+# Using data provided from the Star Wars API (https://swapi.dev/)
+# produce a  list of all possible species for a given planet
 
-# produce a
-#       list
-
-# of all possible
-#       species
-
-# for a given
-#       planet
-
-# Planet Name --> Planet URL
+# Query Path:
+# Planet Name --> Planet URL ---> List of Resident's URLs --> List of Species
 
 import json
 from urllib.request import urlopen
@@ -26,6 +18,7 @@ def api_call(url: str) -> dict:
 
 def convert_to_people(resident_list: list) -> list:
     species_set = set()
+    # TODO: Convert following loop to a set comprehension instead
     for resident in resident_list:
         species_set |= {*api_call(url=resident).get('species')}
     return [api_call(url=species).get('name') for species in species_set]
@@ -37,13 +30,15 @@ def read_planet(planet_name: str, request_url: str = planet_url) -> dict:
         if planet.get("name") == planet_name:  # if you find the planet
             return planet
     # otherwise, cycle to the next page
-    return read_planet(planet_name=planet_name, request_url=next_page) if (next_page := planets_dict.get('next')) else next_page
+    # TODO: Clean following return statement
+    return read_planet(planet_name=planet_name, request_url=next_page) if (
+        next_page := planets_dict.get('next')) else None
 
 
 def main(user_input: str) -> list:
     if planet_dict := read_planet(planet_name=user_input):  # check if planet exists
-        return convert_to_people(resident_list=planet_dict.get('residents'))  # check if planet exists
-    return ["Planet not found"]
+        return convert_to_people(resident_list=planet_dict.get('residents'))  # return all species on that planet
+    return ["Planet not found"]  # error statement
 
 
 def tester():
@@ -57,4 +52,4 @@ def tester():
 
 if __name__ == '__main__':
     tester()
-    print("Everything passed")
+    print("Everything passed!")
